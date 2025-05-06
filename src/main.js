@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import gsap from 'gsap';
 
 const gui = new dat.GUI()
+
 //this is the object with the modifiable objects & properties
 const world = {
   plane: {
@@ -46,6 +47,8 @@ const raycaster = new THREE.Raycaster()
 const scene = new THREE.Scene();
 //camera uses (degrees of perspective, aspect ratio, close clipping plane, far clipping pane) -> 4 args
 const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000)
+camera.position.y = 25
+camera.position.z = 180
 //create a render
 const renderer = new THREE.WebGLRenderer()
 
@@ -56,7 +59,6 @@ renderer.setPixelRatio(devicePixelRatio);
 document.body.appendChild(renderer.domElement)
 
 new OrbitControls(camera, renderer.domElement)
-camera.position.z = 75
 
 //takes 3 args for this: (width, length, height) all measured in a unit of some form
 // const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
@@ -71,6 +73,7 @@ const planeMaterial = new THREE.MeshPhongMaterial({side: THREE.DoubleSide, flatS
 //args are (geometry, material)
 // const mesh = new THREE.Mesh(boxGeometry, material);
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+planeMesh.rotation.x = -Math.PI / 2
 
 //to find vertices, go to this console.log. Every 3 items represents XYZ
 // console.log(planeMesh.geometry.attributes.position.array)
@@ -84,7 +87,7 @@ for (let i = 0; i < array.length; i++) {
 
   array[i] = x + (Math.random() - 0.5) * 3
   array[i + 1] = y + (Math.random() - 0.5) * 3
-  array[i + 2] = z + (Math.random() - 0.5) * 3
+  array[i + 2] = z + (Math.random() - 0.5)
 
   randomValues.push(Math.random() - 0.5)
 }
@@ -96,7 +99,7 @@ planeMesh.geometry.attributes.position.originalPosition = planeMesh.geometry.att
 //color attribute addition
 const colors = [];
 for (let i = 0; i < planeMesh.geometry.attributes.position.count; i++) {
-  colors.push(0, 0, 1);
+  colors.push(0.02, 1, 0.5);
 }
 
 planeMesh.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
@@ -133,8 +136,8 @@ function animate() {
   frame += 0.01
   const {array, originalPosition, randomValues} = planeMesh.geometry.attributes.position
   for (let i = 0; i < array.length; i += 3) {
-    array[i] = originalPosition[i] + Math.cos(frame + randomValues[i]) * 0.003
-    array[i + 1] = originalPosition[i + 1] + Math.cos(frame + randomValues[i]) * 0.003
+    array[i] = originalPosition[i] + Math.cos(frame + randomValues[i]) * 0.001
+    array[i + 1] = originalPosition[i + 1] + Math.cos(frame + randomValues[i]) * 0.001
   }
   planeMesh.geometry.attributes.position.needsUpdate = true;
   const intersects = raycaster.intersectObject(planeMesh)
@@ -156,14 +159,14 @@ function animate() {
     intersects[0].object.geometry.attributes.color.needsUpdate = true;
 
     const initialColor = {
-      r: 0,
-      g: 0,
-      b: 1
+      r: 0.02,
+      g: 1,
+      b: 0.4
     };
     const hoverColor = {
-      r: 0,
+      r: 0.5,
       g: 0.5,
-      b: 0.9
+      b: 0.5
     };
 
     gsap.to(hoverColor, {
